@@ -5,13 +5,9 @@ WORKDIR /var/www/akeneo
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-  build-essential libpng-dev libjpeg62-turbo-dev \
-  libfreetype6-dev locales zip jpegoptim optipng \
-  pngquant gifsicle vim unzip git curl libonig-dev \
-  libzip-dev libgd-dev libjpeg-dev libssl-dev \
-  libxml2-dev libreadline-dev libxslt-dev \
-  supervisor bash mycli gnupg2 libmagickwand-dev \
-  libmagickcore-dev nodejs npm
+  build-essential libpng-dev libjpeg62-turbo-dev libfreetype6-dev locales zip jpegoptim optipng pngquant gifsicle vim unzip git curl libonig-dev \
+  libzip-dev libgd-dev libjpeg-dev libssl-dev libxml2-dev libreadline-dev libxslt-dev supervisor bash mycli gnupg2 libmagickwand-dev libmagickcore-dev \
+  nodejs npm
 
 RUN pecl install imagick && pecl install apcu
 
@@ -19,9 +15,11 @@ RUN pecl install imagick && pecl install apcu
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install yarn
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN apt update && apt install -y yarn
+# RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+# RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+# RUN apt update && apt install -y yarn
+RUN npm install --global yarn
+RUN yarn --version
 
 # Install the PHP bcmath extension
 RUN docker-php-ext-install bcmath
