@@ -4,96 +4,56 @@ FROM php:8.1-fpm
 WORKDIR /var/www/akeneo
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-  build-essential libpng-dev libjpeg62-turbo-dev libfreetype6-dev locales zip jpegoptim optipng pngquant gifsicle vim unzip git curl libonig-dev \
-  libzip-dev libgd-dev libjpeg-dev libssl-dev libxml2-dev libreadline-dev libxslt-dev supervisor bash mycli gnupg2 libmagickwand-dev libmagickcore-dev \
-  nodejs npm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential libpng-dev libjpeg62-turbo-dev libfreetype6-dev locales zip jpegoptim optipng pngquant gifsicle vim unzip git curl \
+    libonig-dev libzip-dev libgd-dev libssl-dev libxml2-dev libreadline-dev libxslt-dev supervisor bash mycli gnupg2 \
+    libmagickwand-dev libmagickcore-dev nodejs npm \
+ && pecl install imagick apcu swoole \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
-RUN pecl install imagick && pecl install apcu
+# Install Yarn
+RUN npm install --global yarn && yarn --version
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install yarn
-# RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-# RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-# RUN apt update && apt install -y yarn
-RUN npm install --global yarn
-RUN yarn --version
-
-# Install the PHP bcmath extension
-RUN docker-php-ext-install bcmath
-
-# Install for image manipulation
-RUN docker-php-ext-install exif
-
-# Install the PHP graphics library
-RUN docker-php-ext-configure gd \
-  --with-freetype \
-  --with-jpeg
-RUN docker-php-ext-install gd
-
-# Install the PHP intl extention
-RUN docker-php-ext-install intl
-
-# Install the PHP mysqli extention
-RUN docker-php-ext-install mysqli && \
-  docker-php-ext-enable mysqli
-
-# Install the PHP opcache extention
-RUN docker-php-ext-install opcache
-
-# Install the PHP pcntl extention
-RUN docker-php-ext-install pcntl
-
-# Install the PHP pdo_mysql extention
-RUN docker-php-ext-install pdo_mysql
-
-# Install the PHP zip extention
-RUN docker-php-ext-install zip
-
-# Install the PHP xsl extention
-RUN docker-php-ext-install xsl
-
-# Install the PHP sockets extention
-RUN docker-php-ext-install sockets
-
-# Install the PHP soap extention
-RUN docker-php-ext-install soap
-
-# Install the PHP curl extension
-# RUN docker-php-ext-install curl
-
-# Install the PHP xml extension
-RUN docker-php-ext-install xml
-
-# Install the PHP zip extension
-RUN docker-php-ext-install zip
-
-# Install the PHP mbstring extension
-RUN docker-php-ext-install mbstring
-
-# Install the PHP imagick extension
-RUN docker-php-ext-enable imagick
-
-# Install the PHP acpu extension
-RUN docker-php-ext-enable apcu
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+ && docker-php-ext-install \
+    bcmath \
+    calendar \
+    exif \
+    gd \
+    gettext \
+    intl \
+    mbstring \
+    mysqli \
+    opcache \
+    pcntl \
+    pdo_mysql \
+    soap \
+    sockets \
+    xsl \
+    xml \
+    zip \
+ && docker-php-ext-enable \
+    mysqli \
+    imagick \
+    apcu \
+    swoole
 
 # Install Composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Add Composer to the PATH
-ENV PATH="$PATH:/usr/local/bin"
+ENV PATH="/usr/local/bin:$PATH"
 
-# Add user for laravel application
-RUN groupadd -g 1000 app
-RUN useradd -u 1000 -ms /bin/bash -g app app
+# Create application user
+RUN groupadd -g 1000 app && \
+    useradd -u 1000 -ms /bin/bash -g app app && \
+    chown -R app:app /var/www/akeneo
 
-# Copy existing application directory permissions
-RUN chown=app:app . /var/www/akeneo
-
-# Change current user to www
+# Switch to non-root user
 USER app
 
-# Expose port 9000 and start php-fpm server
+# Expose port 9000 and start php-fpm
+EXPOSE 9000
 CMD ["php-fpm"]
