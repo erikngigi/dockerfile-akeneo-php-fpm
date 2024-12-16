@@ -1,7 +1,7 @@
 FROM php:8.1-fpm
 
 # Set working directory
-WORKDIR /var/www/akeneo
+WORKDIR /var/www/akeneo/pim-community-standard
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Yarn
 RUN npm install --global yarn && yarn --version
+
+# Update browerlist using npm
+RUN npm i browserslist
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
