@@ -39,11 +39,11 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     zip
 
 # Enable the third party extensions installed using pecl
-RUN docker-php-ext-enable \
-    acpu \
-    imagick \
-    mysqli \
-    swoole
+# RUN docker-php-ext-enable \
+#     acpu \
+#     imagick \
+#     mysqli \
+#     swoole
 
 # Install Composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
