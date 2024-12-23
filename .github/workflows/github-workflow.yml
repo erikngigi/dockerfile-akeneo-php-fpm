@@ -1,4 +1,4 @@
-name: Build and push Docker image to GHCR
+name: Build and push Docker image to TSRV Github Container Registry.
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.READ_WRITE_GHCR }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -27,6 +27,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/erikngigi/akeneo-php-fpm:latest
+          tags: ghcr.io/${{ github.repository }}:latest
