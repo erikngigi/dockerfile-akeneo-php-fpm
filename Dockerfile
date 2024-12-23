@@ -11,6 +11,7 @@ FROM base as build
 RUN set -eux \
   && apk add --no-cache --virtual .build-deps \
   autoconf \
+  build-base \
   bzip2-dev \
   cmake \
   curl-dev \
