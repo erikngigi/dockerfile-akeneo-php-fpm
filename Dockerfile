@@ -52,17 +52,17 @@ RUN set -eux \
 # PHP Extensions
 ############################################
 # Install the PHP shared memory driver
-RUN pecl install APCu && \
+RUN pecl install apcu && \
   docker-php-ext-enable apcu
 
 # Install the PHP bcmath extension
 RUN docker-php-ext-install bcmath
 
 # Install the PHP cli extension
-RUN docker-php-ext-install cli
+# RUN docker-php-ext-install cli
 
 # Install the PHP curl extension
-RUN docker-php-ext-install curl
+# RUN docker-php-ext-install curl
 
 # Install for image manipulation
 RUN docker-php-ext-install exif
