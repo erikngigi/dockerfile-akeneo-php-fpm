@@ -1,55 +1,110 @@
-FROM php:8.1-fpm
+FROM php:8.1-fpm-alpine as base
 
-# Set working directory
-WORKDIR /var/www/akeneo/pim-community-standard
+RUN apk update --no-cache && \
+    apk upgrade --no-cache
+RUN apk add --no-cache \
+    supervisor
 
-# Install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential libpng-dev libjpeg62-turbo-dev libfreetype6-dev locales zip jpegoptim optipng pngquant gifsicle vim unzip git curl \
-    libonig-dev libzip-dev libgd-dev libssl-dev libxml2-dev libreadline-dev libxslt-dev supervisor bash mycli gnupg2 libmagickwand-dev \
-    libmagickcore-dev nodejs npm less
+FROM base as build
 
-# Install third party extensions
-RUN pecl install imagick apcu swoole
+RUN apk add --no-cache \
+    $PHPIZE_DEPS \
+    linux-headers
+RUN apk add --no-cache \
+    freetype-dev \
+    jpeg-dev \
+    icu-dev \
+    libzip-dev
 
-# Clear out the local repository of retrieved packages
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+############################################
+# PHP Extensions
+############################################
+# Install the PHP shared memory driver
+RUN pecl install APCu && \
+    docker-php-ext-enable apcu
+
+# Install the PHP bcmath extension
+RUN docker-php-ext-install bcmath
+
+# Install the PHP cli extension
+RUN docker-php-ext-install cli
+
+# Install the PHP curl extension
+RUN docker-php-ext-install curl
+
+# Install for image manipulation
+RUN docker-php-ext-install exif
+
+# Install the PHP gd extension
+RUN docker-php-ext-install gd
+
+# Install the PHP imagick extension for image manipulation
+RUN pecl install imagick && \
+    docker-php-ext-enable imagick
+
+# Install the PHP intl extension
+RUN docker-php-ext-install intl
+
+# Install the PHP mbstring extension
+RUN docker-php-ext-install mbstring
+
+# Install the PHP mysqli extension
+RUN docker-php-ext-install mysqli && \
+    docker-php-ext-enable mysqli
+
+# Install the PHP opcache extension
+RUN docker-php-ext-enable opcache
+
+# Install the PHP pcntl extension
+RUN docker-php-ext-install pcntl
+
+# Install the PHP pdo_mysql extension
+RUN docker-php-ext-install pdo_mysql
+
+# Install the PHP redis driver
+RUN pecl install redis && \
+    docker-php-ext-enable redis
+
+# Install XDebug but without enabling
+RUN pecl install xdebug
+
+# Install the PHP xml extension
+RUN docker-php-ext-install xml
+
+# Install the PHP zip extension
+RUN docker-php-ext-install zip
+
+FROM base as target
+
+########################################
+# Install necessary libraries
+########################################
+RUN apk add --no-cache \
+    freetype \
+    jpeg \
+    icu \
+    libzip \
+    bash \
+    nodejs \
+    npm
 
 # Install yarn globally using npm
 RUN npm install --global yarn
 
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install \
-    bcmath \
-    calendar \
-    exif \
-    gd \
-    gettext \
-    intl \
-    mbstring \
-    mysqli \
-    opcache \
-    pcntl \
-    pdo_mysql \
-    soap \
-    sockets \
-    xsl \
-    xml \
-    zip
+#####################################
+# Copy extensions from build stage
+#####################################
+COPY --from=build /usr/local/lib/php/extensions/no-debug-non-zts-20210902/* /usr/local/lib/php/extensions/no-debug-non-zts-20210902
+COPY --from=build /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d
 
-# Enable the third party extensions installed using pecl
-# RUN docker-php-ext-enable \
-#     acpu \
-#     imagick \
-#     mysqli \
-#     swoole
+#####################################
+# Composer
+#####################################
+RUN curl -s http://getcomposer.org/installer | php && \
+    mv composer.phar /usr/local/bin/composer
 
-# Install Composer globally
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Add Composer to the PATH
-ENV PATH="/usr/local/bin:$PATH"
+# Set working directory
+WORKDIR /var/www/akeneo/pim-community-standard
 
 # Create application user
 RUN groupadd -g 1000 akeneo && \

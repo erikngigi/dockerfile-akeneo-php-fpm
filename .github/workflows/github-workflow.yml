@@ -2,7 +2,7 @@ name: Build and push Docker image to TSRV Github Container Registry.
 
 on:
   push:
-    branches: ["main"]
+    branches: ["lean-base-image"]
 
 jobs:
   build:
