@@ -79,7 +79,7 @@ RUN pecl install imagick && \
 RUN docker-php-ext-install intl
 
 # Install the PHP mbstring extension
-RUN docker-php-ext-install mbstring
+# RUN docker-php-ext-install mbstring
 
 # Install the PHP mysqli extension
 RUN docker-php-ext-install mysqli && \
