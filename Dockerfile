@@ -14,7 +14,9 @@ RUN apk add --no-cache \
     freetype-dev \
     jpeg-dev \
     icu-dev \
-    libzip-dev
+    libzip-dev \
+    build-base \
+    libmagickwand-dev 
 
 ############################################
 # PHP Extensions
@@ -25,6 +27,12 @@ RUN pecl install APCu && \
 
 # Install the PHP bcmath extension
 RUN docker-php-ext-install bcmath
+
+# Install the PHP cli extension
+RUN docker-php-ext-install cli
+
+# Install the PHP curl extension
+RUN docker-php-ext-install curl
 
 # Install for image manipulation
 RUN docker-php-ext-install exif
@@ -80,7 +88,9 @@ RUN apk add --no-cache \
     libzip \
     bash \
     nodejs \
-    npm
+    npm \
+    vim \
+    curl
 
 # Install yarn globally using npm
 RUN npm install --global yarn
