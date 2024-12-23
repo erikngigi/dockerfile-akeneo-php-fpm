@@ -26,9 +26,6 @@ RUN pecl install APCu && \
 # Install the PHP bcmath extension
 RUN docker-php-ext-install bcmath
 
-# Install the PHP cli extension
-RUN docker-php-ext-install cli
-
 # Install the PHP curl extension
 RUN docker-php-ext-install curl
 
