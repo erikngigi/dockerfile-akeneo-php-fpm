@@ -1,22 +1,13 @@
-FROM php:8.1-fpm-alpine as base
+FROM php:8.1-fpm
 
-RUN apk update --no-cache && \
-    apk upgrade --no-cache
-RUN apk add --no-cache \
-    supervisor
+# Install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential libpng-dev libjpeg62-turbo-dev libfreetype6-dev locales zip jpegoptim optipng pngquant gifsicle vim unzip git curl \
+    libonig-dev libzip-dev libgd-dev libssl-dev libxml2-dev libreadline-dev libxslt-dev supervisor bash mycli gnupg2 libmagickwand-dev \
+    libmagickcore-dev nodejs npm less
 
-FROM base as build
-
-RUN apk add --no-cache \
-    $PHPIZE_DEPS \
-    linux-headers
-RUN apk add --no-cache \
-    freetype-dev \
-    jpeg-dev \
-    icu-dev \
-    libzip-dev \
-    build-base \
-    libmagickwand-dev 
+# Clear out the local repository of retrieved packages
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ############################################
 # PHP Extensions
@@ -76,30 +67,8 @@ RUN docker-php-ext-install xml
 # Install the PHP zip extension
 RUN docker-php-ext-install zip
 
-FROM base as target
-
-########################################
-# Install necessary libraries
-########################################
-RUN apk add --no-cache \
-    freetype \
-    jpeg \
-    icu \
-    libzip \
-    bash \
-    nodejs \
-    npm \
-    vim \
-    curl
-
 # Install yarn globally using npm
 RUN npm install --global yarn
-
-#####################################
-# Copy extensions from build stage
-#####################################
-COPY --from=build /usr/local/lib/php/extensions/no-debug-non-zts-20210902/* /usr/local/lib/php/extensions/no-debug-non-zts-20210902
-COPY --from=build /usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d
 
 #####################################
 # Composer
