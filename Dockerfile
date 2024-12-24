@@ -3,9 +3,6 @@ FROM php:8.1-fpm
 LABEL Maintainer="Eric Ngigi <ericmosesngigi@gmail.com>" \
   Description="PHP-FPM v8.1 with essential extensions for Akeneo."
 
-# Set working directory
-WORKDIR /var/www/akeneo/pim-community-standard
-
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential libpng-dev libjpeg62-turbo-dev libfreetype6-dev locales zip jpegoptim optipng pngquant gifsicle vim unzip git curl \
@@ -52,12 +49,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 ENV PATH="/usr/local/bin:$PATH"
 
 # Create application user
-RUN groupadd -g 1000 app && \
-  useradd -u 1000 -ms /bin/bash -g app app && \
-  chown -R app:app /var/www/akeneo
+RUN groupadd -g 1000 akeneo && \
+  useradd -u 1000 -ms /bin/bash -g akeneo akeneo
 
 # Switch to non-root user
-USER app
+USER akeneo
 
 # Expose port 9000 and start php-fpm
 EXPOSE 9000
