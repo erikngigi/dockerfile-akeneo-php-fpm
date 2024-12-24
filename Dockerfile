@@ -49,12 +49,12 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 ENV PATH="/usr/local/bin:$PATH"
 
 # Create application user
-RUN groupadd -g 1000 akeneo && \
-  useradd -u 1000 -ms /bin/bash -g akeneo akeneo && \
-  chown -R akeneo:akeneo /var/www/akeneo
+RUN groupadd -g 1000 app && \
+  useradd -u 1000 -ms /bin/bash -g app app && \
+  chown -R app:app /var/www/akeneo
 
 # Switch to non-root user
-USER akeneo
+USER app
 
 # Set working directory
 WORKDIR /var/www/akeneo/pim-community-standard
