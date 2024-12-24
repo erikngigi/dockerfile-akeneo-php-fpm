@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libmagickcore-dev nodejs npm less
 
 # Install third party extensions
-RUN pecl install acpu imagick
+RUN pecl install apcu imagick
 
 # Clear out the local repository of retrieved packages
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -39,7 +39,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
   zip
 
 RUN docker-php-ext-enable \
-  acpu \
+  apcu \
   imagick
 
 # Install Composer globally
