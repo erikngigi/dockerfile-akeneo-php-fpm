@@ -1,4 +1,4 @@
-name: Build and push Docker image to TSRV Github Container Registry.
+name: Build and push Docker image to Github Container Registry.
 
 on:
   push:
