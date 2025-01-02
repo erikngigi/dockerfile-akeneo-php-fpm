@@ -55,6 +55,6 @@ RUN groupadd -g 1000 akeneo && \
 # Switch to non-root user
 USER akeneo
 
-# Expose port 9000 and start php-fpm
-EXPOSE 9001
+# Expose port 9100 and start php-fpm
+EXPOSE 9100
 CMD ["php-fpm"]
