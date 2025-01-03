@@ -5,7 +5,8 @@ LABEL Maintainer="Eric Ngigi <ericmosesngigi@gmail.com>" \
   Description="PHP-FPM v8.1 with essential extensions for Akeneo."
 
 # Set working directory
-WORKDIR /var/www/html
+RUN mkdir -p /var/www/html/akeneo
+WORKDIR /var/www/html/akeneo
 
 # Install system dependencies, clean apt cache
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -50,7 +51,7 @@ ENV PATH="/usr/local/bin:$PATH"
 # Create application user
 RUN groupadd -g 1000 akeneo && \
   useradd -u 1000 -ms /bin/bash -g akeneo akeneo && \
-  chown -R akeneo:akeneo /var/www/html
+  chown -R akeneo:akeneo /var/www/html/akeneo
 
 # Switch to non-root user
 USER akeneo
