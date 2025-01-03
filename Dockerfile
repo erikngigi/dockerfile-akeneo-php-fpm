@@ -5,8 +5,8 @@ LABEL Maintainer="Eric Ngigi <ericmosesngigi@gmail.com>" \
   Description="PHP-FPM v8.1 with essential extensions for Akeneo."
 
 # Set working directory
-RUN mkdir -p /var/www/html/akeneo
-WORKDIR /var/www/html/akeneo
+RUN mkdir -p /var/www/html/akeneo && mkdir -p /var/www/html/akeneo/pim
+WORKDIR /var/www/html/akeneo/pim
 
 # Install system dependencies, clean apt cache
 RUN apt-get update && apt-get install -y --no-install-recommends \
